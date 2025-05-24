@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>This-is-for-you！</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+let particles = [];
+let stars = [];
+let outlineParticles = [];
+
+function setup() {
+  // 创建全屏画布
+  createCanvas(windowWidth, windowHeight);
+  noStroke();
+
+  // 生成星空背景粒子（数量根据屏幕尺寸自适应）
+  const starCount = (windowWidth * windowHeight) / 2500;
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: random(width),
+      y: random(height),
+      size: random(1, 3),
+      alpha: random(100, 255)
+    });
+  }
+
+  // 生成爱心内部粒子
+  for (let i = 0; i < 5000; i++) {
+    let t = random(TWO_PI);
+    let r = pow(random(1), 0.4);
+    let x = 16 * pow(sin(t), 3) * r;
+    let y = -(13 * cos(t) - 5 * cos(2*t) - 2 * cos(3*t) - cos(4*t)) * r;
+    particles.push(createVector(x, y));
+  }
+
+  // 生成外围粒子
+  for (let i = 0; i < 800; i++) {
+    let t = random(TWO_PI);
+    let r = random(1.05, 1.3);
+    let x = 16 * pow(sin(t), 3) * r;
+    let y = -(13 * cos(t) - 5 * cos(2*t) - 2 * cos(3*t) - cos(4*t)) * r;
+    outlineParticles.push(createVector(x, y));
+  }
+}
+
+function draw() {
+  background(0);
+
+  // 动态星空效果
+  for (let s of stars) {
+    fill(255, s.alpha + random(-30, 30));
+    ellipse(s.x, s.y, s.size, s.size);
+  }
+
+  translate(width/2, height/2);
+  
+  // 自适应缩放比例（根据屏幕尺寸动态调整）
+  const baseScale = min(width, height) / 60;
+  let scaleVal = baseScale * (1 + 0.15 * sin(frameCount * 0.07));
+
+  // 绘制心形内部
+  fill(255, 60, 120, 200);
+  for (let p of particles) {
+    let px = p.x * scaleVal + random(-0.5, 0.5);
+    let py = p.y * scaleVal + random(-0.5, 0.5);
+    ellipse(px, py, 1.8, 1.8);
+  }
+
+  // 绘制外围光晕
+  fill(255, 80, 140, 90);
+  for (let op of outlineParticles) {
+    let px = op.x * scaleVal + random(-0.8, 0.8);
+    let py = op.y * scaleVal + random(-0.8, 0.8);
+    ellipse(px, py, 2.2, 2.2);
+  }
+}
+
+// 窗口大小改变时自动适配
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  setup(); // 重新初始化粒子
+}
+</script>
+</body>
+</html>
